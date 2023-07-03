@@ -15,12 +15,15 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     QString text = "Mines Left: ";
     QString num = QString::number(this->numOfMines);
     text.append(num);
-    ui->labeMinesLeft->setText(text);
+    ui->labelMinesLeft->setText(text);
     QString strRow = (this->boardSize.split("x"))[0];
     QString strCol = (this->boardSize.split("x"))[1];
     int rows = strRow.toInt();
     int cols = strCol.toInt();
+    this->setMinimumSize(45*cols, 45*rows + 40);
+    ui->gridLayoutWidget_2->setMinimumSize(44*cols, 40);
 
+    //ui->formLayout->SetFixedSize;
     butArr = new QPushButton*[cols*rows];
     qDebug() << QDir::currentPath();
     for (int i = 0; i < rows; i++) {
@@ -30,7 +33,9 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
             objName = objName.arg(i, j);*/
             QString buttonName = "pushButton_";
             pushButton->setObjectName(buttonName.append(QString::number(i*cols+j)));
+            pushButton->setFixedSize(37, 37);
             pushButton->setIcon(QIcon("1.png"));
+            pushButton->setIconSize(QSize(37, 37));
             butArr[i*cols+j] = pushButton;
             qDebug() << pushButton;
             connect(pushButton, SIGNAL(clicked()), this, SLOT(on_button_clicked()));
