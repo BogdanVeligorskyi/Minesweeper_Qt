@@ -9,7 +9,7 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         ui(new Ui::PlayWindow)
 {
     ui->setupUi(this);
-
+    setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->numOfMines = numOfMines;
     this->boardSize = boardSize;
     QString text = "Mines Left: ";

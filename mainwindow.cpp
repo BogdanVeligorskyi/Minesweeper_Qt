@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui(new Ui::MainWindow) {
     ui->setupUi(this);
     setWindow = new SettingsWindow(this);
+    setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     /*mines_counter = 0;
     mines_left = 10;
     columns = 11;
