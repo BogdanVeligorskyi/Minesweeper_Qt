@@ -4,22 +4,26 @@
 #include <QDir>
 #include <map>
 
+void generateMines(int[], int, int);
+
 PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         QDialog(parent),
-        ui(new Ui::PlayWindow)
-{
+        ui(new Ui::PlayWindow) {
     ui->setupUi(this);
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->numOfMines = numOfMines;
     this->boardSize = boardSize;
+
     QString text = "Mines Left: ";
     QString num = QString::number(this->numOfMines);
     text.append(num);
     ui->labelMinesLeft->setText(text);
+
     QString strRow = (this->boardSize.split("x"))[0];
     QString strCol = (this->boardSize.split("x"))[1];
     int rows = strRow.toInt();
     int cols = strCol.toInt();
+
     this->setMinimumSize(45*cols, 45*rows + 40);
     ui->gridLayoutWidget_2->setMinimumSize(44*cols, 40);
 
@@ -45,6 +49,10 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     /*for (int k = 0; k < cols*rows; k++) {
         qDebug() << butArr[k]->text();
     }*/
+    int minesCounter = this->numOfMines;
+    int* mines_arr = new int[minesCounter];
+    generateMines(mines_arr, minesCounter, rows*cols);
+
 
 }
 
@@ -58,5 +66,19 @@ void PlayWindow::on_button_clicked() {
     QString textStart = "You have clicked buttton: ";
     QString text = textStart.append(buttonSender->objectName());
     qDebug()<< text;
-    //qDebug() << "4545454";
- }
+}
+
+void generateMines(int mines_arr[], int numberOfMines, int square) {
+    qsrand(time(NULL)|clock());
+    for (int i = 0; i < numberOfMines; i++) {
+        mines_arr[i] = qrand() % square-1;
+    }
+    qDebug() << "Mines Array:";
+    for (int j = 0; j < numberOfMines; j++) {
+        qDebug() << mines_arr[j] << " ";
+    }
+    /*if () {
+
+    }*/
+
+}

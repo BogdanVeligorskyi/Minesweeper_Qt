@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindow = new SettingsWindow(this);
     setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
+
     /*mines_counter = 0;
     mines_left = 10;
     columns = 11;
@@ -42,7 +43,7 @@ void MainWindow::on_pushPlayButton_clicked() {
 void MainWindow::on_pushSettingsButton_clicked() {
     this->hide();
     setWindow->exec();
-    qDebug()<< "HERE";
+    qDebug()<< "Returned to Main menu";
     int mines = setWindow->getNumOfMines();
     QString boardSize = setWindow->getBoardSize();
     qDebug() << boardSize;

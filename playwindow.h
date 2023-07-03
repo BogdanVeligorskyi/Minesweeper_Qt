@@ -21,6 +21,13 @@ private:
     QString boardSize;
     QPushButton **butArr;
 
+    /*typedef struct {
+            int x;
+            int y;
+        } mines_struct;
+
+    mines_struct *mines_arr;*/
+
 private slots:
     void on_button_clicked();
 };
