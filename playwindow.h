@@ -18,18 +18,16 @@ public:
 private:
     Ui::PlayWindow *ui;
     int numOfMines;
+    int minesCounter;
     QString boardSize;
     QPushButton **butArr;
 
-    /*typedef struct {
-            int x;
-            int y;
-        } mines_struct;
-
-    mines_struct *mines_arr;*/
+    int *mines_arr;
+    int *found_mines_arr;
 
 private slots:
     void on_button_clicked();
+    bool checkIfMine(QPushButton*, int[], int, int);
 };
 
 #endif // PLAYWINDOW_H

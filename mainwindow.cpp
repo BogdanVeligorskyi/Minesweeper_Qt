@@ -12,19 +12,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindow = new SettingsWindow(this);
     setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
-
+    this->setWindowIcon(QIcon("mine_usual.png"));
     /*mines_counter = 0;
     mines_left = 10;
     columns = 11;
     rows = 11;
     mines_arr = new mines_struct[10];*/
-
-
-    //ui->labelMinesLeft->setText("Mines left: 10");
-    //mines_generator(mines_arr, 10, 10);
-    //connect(ui->pushPlayButton, clicked(), this, &MainWindow::onPlayClicked());
-    //connect(ui->pushSettingsButton, clicked(), this, &MainWindow::onSettingsClicked());
-
 }
 
 // window destructor

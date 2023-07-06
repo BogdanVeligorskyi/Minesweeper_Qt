@@ -4,13 +4,14 @@
 #include <QDir>
 #include <map>
 
-void generateMines(int[], int, int);
+int* generateMines(int[], int, int);
 
 PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         QDialog(parent),
         ui(new Ui::PlayWindow) {
     ui->setupUi(this);
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    //this->setWindowIcon(QIcon("3.png"));
     this->numOfMines = numOfMines;
     this->boardSize = boardSize;
 
@@ -38,10 +39,10 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
             QString buttonName = "pushButton_";
             pushButton->setObjectName(buttonName.append(QString::number(i*cols+j)));
             pushButton->setFixedSize(37, 37);
-            pushButton->setIcon(QIcon("1.png"));
+            //pushButton->setIcon(QIcon("1.png"));
             pushButton->setIconSize(QSize(37, 37));
             butArr[i*cols+j] = pushButton;
-            qDebug() << pushButton;
+            //qDebug() << pushButton;
             connect(pushButton, SIGNAL(clicked()), this, SLOT(on_button_clicked()));
             ui->gridLayout->addWidget(pushButton, i, j);
         }
@@ -49,10 +50,13 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     /*for (int k = 0; k < cols*rows; k++) {
         qDebug() << butArr[k]->text();
     }*/
-    int minesCounter = this->numOfMines;
-    int* mines_arr = new int[minesCounter];
-    generateMines(mines_arr, minesCounter, rows*cols);
-
+    this->minesCounter = this->numOfMines;
+    this->found_mines_arr = new int[this->minesCounter];
+    for (int i = 0; i < this->minesCounter; i++) {
+        found_mines_arr[i] = 0;
+    }
+    this->mines_arr = new int[this->minesCounter];
+    mines_arr = generateMines(mines_arr, this->minesCounter, rows*cols);
 
 }
 
@@ -66,19 +70,70 @@ void PlayWindow::on_button_clicked() {
     QString textStart = "You have clicked buttton: ";
     QString text = textStart.append(buttonSender->objectName());
     qDebug()<< text;
+
+    QStringList strList = buttonSender->objectName().split("_");
+    QString buttonNumStr = strList.value(1);
+    int buttonNumInt = buttonNumStr.toInt();
+    if (checkIfMine(buttonSender, this->mines_arr, this->numOfMines, buttonNumInt)) {
+        QString text = "Mines Left: ";
+        QString num = QString::number(this->minesCounter);
+        text.append(num);
+        ui->labelMinesLeft->setText(text);
+    }
 }
 
-void generateMines(int mines_arr[], int numberOfMines, int square) {
+int* generateMines(int mines_arr[], int numberOfMines, int square) {
     qsrand(time(NULL)|clock());
+
     for (int i = 0; i < numberOfMines; i++) {
-        mines_arr[i] = qrand() % square-1;
+        bool isUnique = false;
+        while (!isUnique) {
+            int randNum = qrand() % square-1;
+            for (int k = 0; k <= i; k++) {
+                if (mines_arr[k] == randNum || randNum <= 0) {
+                    isUnique = false;
+                    break;
+                }
+                if (k == i) {
+                    mines_arr[i] = randNum;
+                    isUnique = true;
+                }
+            }
+        }
     }
     qDebug() << "Mines Array:";
     for (int j = 0; j < numberOfMines; j++) {
         qDebug() << mines_arr[j] << " ";
     }
-    /*if () {
+    return mines_arr;
 
-    }*/
+}
 
+bool PlayWindow::checkIfMine(QPushButton* but, int mines_arr[], int numberOfMines, int buttonNumInt) {
+    for (int i = 0; i < numberOfMines; i++) {
+        //qDebug() << mines_arr[i] << " ";
+        if (buttonNumInt == mines_arr[i]) {
+            this->minesCounter--;
+            but->setIcon(QIcon("mine_clicked.png"));
+            but->setIconSize(QSize(37, 37));
+            bool isAlreadyClicked = false;
+            for (int j = 0; j < numberOfMines; j++) {
+                if (this->found_mines_arr[j] == buttonNumInt) {
+                    qDebug() << "Already clicked!";
+                    isAlreadyClicked = true;
+                    break;
+                }
+            }
+            if (isAlreadyClicked == true) {
+                this->minesCounter ++;
+            } else {
+                this->found_mines_arr[this->numOfMines - this->minesCounter] = buttonNumInt;
+
+            }
+            return true;
+        }
+
+    }
+    but->setIcon(QIcon("empty_cell.png"));
+    return false;
 }
