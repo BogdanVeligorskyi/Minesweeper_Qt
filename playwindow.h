@@ -19,15 +19,26 @@ private:
     Ui::PlayWindow *ui;
     int numOfMines;
     int minesCounter;
+    int rows;
+    int cols;
+    int clickedButton;
     QString boardSize;
     QPushButton **butArr;
 
     int *mines_arr;
     int *found_mines_arr;
+    int* visited_arr;
 
 private slots:
     void on_button_clicked();
-    bool checkIfMine(QPushButton*, int[], int, int);
+    bool checkIfMine(QPushButton*, int);
+    int* generateMines(int);
+    int checkNeighbourCells(int);
+    int checkNeighbourCell(int, int);
+    void setIconWithDigit(QPushButton*, int);
+    bool checkIfValidCoord(int, int);
+    int checkForMinesCount(int, int);
+
 };
 
 #endif // PLAYWINDOW_H
