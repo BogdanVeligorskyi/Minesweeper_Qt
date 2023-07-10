@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QDebug>
+#include <QString>
 #include <time.h>
 #include <stdlib.h>
 #include <settingswindow.h>

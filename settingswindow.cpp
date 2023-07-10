@@ -1,7 +1,5 @@
 #include "settingswindow.h"
 #include "ui_settingswindow.h"
-#include <QString>
-#include <QDebug>
 
 bool checkBoardSize(QString, int &, QString &);
 bool checkIfDigit(QChar);

@@ -2,8 +2,7 @@
 #include "playwindow.h"
 #include "settingswindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
-#include <QString>
+
 
 // window constructor
 MainWindow::MainWindow(QWidget *parent) :

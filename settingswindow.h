@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <string.h>
+#include <QString>
+#include <QDebug>
 
 namespace Ui {
     class SettingsWindow;

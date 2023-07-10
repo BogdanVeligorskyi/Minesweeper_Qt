@@ -1,9 +1,7 @@
 #include "mainwindow.h"
 #include "playwindow.h"
 #include "ui_playwindow.h"
-#include <QDir>
-#include <map>
-#include <QQueue>
+
 
 PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         QDialog(parent),
@@ -28,7 +26,7 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
 
     visited_arr = new int[rows*cols];
     butArr = new QRightClickButton*[cols*rows];
-    qDebug() << QDir::currentPath();
+
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             QRightClickButton *pushButton = new QRightClickButton(this);
@@ -45,21 +43,21 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         }
     }
     this->minesCounter = this->numOfMines;
-    this->found_mines_arr = new int[this->minesCounter];
-    for (int i = 0; i < this->minesCounter; i++) {
-        found_mines_arr[i] = 0;
-    }
     this->mines_arr = new int[this->minesCounter];
     mines_arr = generateMines(rows*cols);
 
 }
+
 
 // destructor
 PlayWindow::~PlayWindow() {
     delete ui;
 }
 
+
+// handler for LMB click on cell
 void PlayWindow::on_button_clicked() {
+
     QRightClickButton* buttonSender = qobject_cast<QRightClickButton*>(sender());
     QString textStart = "You have clicked buttton: ";
     QString text = textStart.append(buttonSender->objectName());
@@ -69,20 +67,37 @@ void PlayWindow::on_button_clicked() {
     QString buttonNumStr = strList.value(1);
     int buttonNumInt = buttonNumStr.toInt();
     this->clickedButton = buttonNumInt;
-    if (visited_arr[buttonNumInt] == 2) {
+
+    // if cell has icon - skip it
+    if (visited_arr[buttonNumInt] == 2 || visited_arr[buttonNumInt] == 1) {
         return;
     }
-    if (checkIfMine(buttonSender, buttonNumInt)) {
-        QString text = "Mines Left: ";
-        QString num = QString::number(this->minesCounter);
-        text.append(num);
-        ui->labelMinesLeft->setText(text);
+
+    // check if clicked button contains mine and
+    // stop the game if it`s true
+    if (checkIfMine(buttonNumInt)) {
+        setIconToButton(buttonSender, -3);
+        QMessageBox::about(this, "Game over", "Unfortunately, you`ve lost the game!");
+        delete this->butArr;
+        delete this->visited_arr;
+        this->hide();
+    // otherwise start checking surrounded (neighbour) cells
     } else {
         checkNeighbourCells(buttonNumInt);
     }
+
+    if (checkIfEnd()) {
+        QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
+        delete this->butArr;
+        delete this->visited_arr;
+        this->hide();
+    }
 }
 
+
+// handler for RMB click on cell
 void PlayWindow::on_right_clicked() {
+
     QRightClickButton* buttonSender = qobject_cast<QRightClickButton*>(sender());
     QString textStart = "You have right-clicked buttton: ";
     QString text = textStart.append(buttonSender->objectName());
@@ -90,12 +105,38 @@ void PlayWindow::on_right_clicked() {
     QStringList strList = buttonSender->objectName().split("_");
     QString buttonNumStr = strList.value(1);
     int buttonNumInt = buttonNumStr.toInt();
-    if (visited_arr[buttonNumInt] != 2 && visited_arr[buttonNumInt] != 1) {
+
+
+
+    // if cell hasn`t been clicked or visited
+    if (visited_arr[buttonNumInt] != 2 && visited_arr[buttonNumInt] != 1 && this->minesCounter > 0) {
         setIconToButton(buttonSender, -1);
+        this->minesCounter--;
+        visited_arr[buttonNumInt] = 2;
+
+    // if cell has been already clicked with RMB - return one mine
+    } else if (visited_arr[buttonNumInt] == 2) {
+        setIconToButton(buttonSender, -2);
+        this->minesCounter++;
+        visited_arr[buttonNumInt] = 0;
     }
-    visited_arr[buttonNumInt] = 2;
+
+    // change label text according to number of mines left
+    text = "Mines Left: ";
+    QString num = QString::number(this->minesCounter);
+    text.append(num);
+    ui->labelMinesLeft->setText(text);
+
+    if (checkIfEnd()) {
+        QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
+        delete this->butArr;
+        delete this->visited_arr;
+        this->hide();
+    }
 }
 
+
+// generate fixed number of mines
 int* PlayWindow::generateMines(int square) {
     qsrand(time(NULL)|clock());
 
@@ -123,33 +164,19 @@ int* PlayWindow::generateMines(int square) {
 
 }
 
-bool PlayWindow::checkIfMine(QRightClickButton* but, int buttonNumInt) {
+
+// check if clicked button contains a mine
+bool PlayWindow::checkIfMine(int buttonNumInt) {
     for (int i = 0; i < numOfMines; i++) {
         if (buttonNumInt == mines_arr[i]) {
-            this->minesCounter--;
-            but->setIcon(QIcon("mine_clicked.png"));
-            but->setIconSize(QSize(37, 37));
-            bool isAlreadyClicked = false;
-            for (int j = 0; j < numOfMines; j++) {
-                if (this->found_mines_arr[j] == buttonNumInt) {
-                    qDebug() << "Already clicked!";
-                    isAlreadyClicked = true;
-                    break;
-                }
-            }
-            if (isAlreadyClicked == true) {
-                this->minesCounter ++;
-            } else {
-                this->found_mines_arr[this->numOfMines - this->minesCounter] = buttonNumInt;
-
-            }
             return true;
         }
-
     }
     return false;
 }
 
+
+// draw route until cell with mine as neighbour is found
 int PlayWindow::checkNeighbourCells(int butNum) {
 
     QQueue <int> queue;
@@ -157,7 +184,9 @@ int PlayWindow::checkNeighbourCells(int butNum) {
     visited_arr[butNum] = 1;
     int* arr_of_neighbours = new int[8];
 
+    // draw route to expand all needed cells
     while (queue.length() > 0) {
+
         butNum = queue.at(0);
         qDebug() << "ButNum =" << butNum;
         arr_of_neighbours[0] = butNum - cols;
@@ -169,16 +198,15 @@ int PlayWindow::checkNeighbourCells(int butNum) {
         arr_of_neighbours[6] = butNum - 1;
         arr_of_neighbours[7] = butNum - cols - 1;
         queue.dequeue();
+
         for (int i = 0; i < 8; i++) {
-            // check cell
+
             int res = checkNeighbourCell(butNum, arr_of_neighbours[i]);
             if (res == 0 &&
                 visited_arr[arr_of_neighbours[i]] == 0) {
-                qDebug() << "i =" << i << ", arr_of_neighbours[i] =" << arr_of_neighbours[i];
                 queue.enqueue(arr_of_neighbours[i]);
                 visited_arr[arr_of_neighbours[i]] = 1;
             } else if (res == 1 && visited_arr[arr_of_neighbours[i]] == 0) {
-                qDebug() << "i =" << i << ", arr_of_neighbours[i] =" << arr_of_neighbours[i];
                 visited_arr[arr_of_neighbours[i]] = 1;
             }
         }
@@ -238,12 +266,15 @@ int PlayWindow::checkNeighbourCells(int butNum) {
     return 0;
 }
 
+
+// check neighbour cell
 int PlayWindow::checkNeighbourCell(int firstParam, int butNum) {
 
     if (!checkIfValidCoord(firstParam, butNum)) {
         qDebug() << "Invalid button!";
         return 10;
     }
+
     for (int i = 0; i < numOfMines; i++) {
         if (mines_arr[i] == butNum) {
             //qDebug() << "This button contains mine!";
@@ -251,61 +282,35 @@ int PlayWindow::checkNeighbourCell(int firstParam, int butNum) {
         }
     }
 
-    int upCellNum = butNum - cols;
-    int upRightCellNum = butNum - cols + 1;
-    int rightCellNum = butNum + 1;
-    int downRightCellNum = butNum + cols + 1;
-    int downCellNum = butNum + cols;
-    int downLeftCellNum = butNum + cols - 1;
-    int leftCellNum = butNum - 1;
-    int upLeftCellNum = butNum - cols - 1;
+    int *arr = new int[8];
+    arr[0] = butNum - cols;
+    arr[1] = butNum - cols + 1;
+    arr[2] = butNum + 1;
+    arr[3] = butNum + cols + 1;
+    arr[4] = butNum + cols;
+    arr[5] = butNum + cols - 1;
+    arr[6] = butNum - 1;
+    arr[7] = butNum - cols - 1;
 
     for (int i = 0; i < numOfMines; i++) {
-        if (checkIfValidCoord(butNum, upCellNum) && mines_arr[i] == upCellNum) {
-            qDebug() << "1. This button" << butNum << " has mine neighbours:" << upCellNum;
-            return 1;
+        for (int j = 0; j < 8; j++) {
+            if (checkIfValidCoord(butNum, arr[j]) && mines_arr[i] == arr[j]) {
+                //qDebug() << "1. This button" << butNum << " has mine neighbours:" << upCellNum;
+                return 1;
+            }
         }
-        if (checkIfValidCoord(butNum, upRightCellNum) && mines_arr[i] == upRightCellNum) {
-            qDebug() << "2. This button" << butNum << " has mine neighbours:" << upRightCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, rightCellNum) && mines_arr[i] == rightCellNum) {
-            qDebug() << "3. This button" << butNum << " has mine neighbours:" << rightCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, downRightCellNum) && mines_arr[i] == downRightCellNum) {
-            qDebug() << "4. This button" << butNum << " has mine neighbours:" << downRightCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, downCellNum) && mines_arr[i] == downCellNum) {
-            qDebug() << "5. This button" << butNum << " has mine neighbours:" << downCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, downLeftCellNum) && mines_arr[i] == downLeftCellNum) {
-            qDebug() << "6. This button" << butNum << " has mine neighbours:" << downLeftCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, leftCellNum) && mines_arr[i] == leftCellNum) {
-            qDebug() << "7. This button" << butNum << " has mine neighbours:" << leftCellNum;
-            return 1;
-        }
-        if (checkIfValidCoord(butNum, upLeftCellNum) && mines_arr[i] == upLeftCellNum) {
-            qDebug() << "8. This button" << butNum << " has mine neighbours:" << upLeftCellNum;
-            return 1;
-        }
-
     }
     return 0;
 }
 
 
+// count number of mines in neighbour cells
 int PlayWindow::checkForMinesCount(int firstParam, int num) {
     if (!checkIfValidCoord(firstParam, num)) {
         return 10;
     }
     for (int i = 0; i < numOfMines; i++) {
         if (mines_arr[i] == num) {
-            //qDebug() << "This button has mine neighbours!";
             return 1;
         }
     }
@@ -313,33 +318,37 @@ int PlayWindow::checkForMinesCount(int firstParam, int num) {
 }
 
 
+// check if coordinates of button are valid
 bool PlayWindow::checkIfValidCoord(int firstParam, int num) {
+
     int x = num % cols;
     int y = num / rows;
     int x_prev = firstParam % cols;
-    //qDebug() << "X: " << x << " Y: " << y;
+
     // if cell is out of range
-    if (x < 0 || y < 0 || x >= cols || y > rows || (x == 0 && x_prev == (cols-1)) || (x == (cols-1) && x_prev == 0)) {
-        //qDebug() << "Out of range!";
+    if (x < 0 || y < 0 || x >= cols || y > rows ||
+        (x == 0 && x_prev == (cols-1)) || (x == (cols-1) && x_prev == 0)) {
         return false;
     }
     return true;
 }
 
 
+// set icon to button in order to show additional information needed for user
 void PlayWindow::setIconToButton(QRightClickButton* button, int minesNum) {
-    qDebug() << button->objectName();
+
+    //qDebug() << button->objectName();
+
     if (button == NULL) {
         qDebug() << "Button was not found!";
         return;
     }
+
     QStringList strList = button->objectName().split("_");
     QString buttonNumStr = strList.value(1);
     int buttonNumInt = buttonNumStr.toInt();
     qDebug() << "buttonNumInt =" << buttonNumInt;
-    if (visited_arr[buttonNumInt]==2) {
-        return;
-    }
+
     button->setIconSize(QSize(37, 37));
     if (minesNum == 0) {
         button->setIcon(QIcon("empty_cell.png"));
@@ -357,7 +366,21 @@ void PlayWindow::setIconToButton(QRightClickButton* button, int minesNum) {
         button->setIcon(QIcon("digit_6.png"));
     } else if (minesNum == -1) {
         button->setIcon(QIcon("flag.png"));
+    } else if (minesNum == -2) {
+        button->setIcon(QIcon());
+    } else if(minesNum == -3) {
+        button->setIcon(QIcon("mine_clicked.png"));
     }
+
 }
 
 
+// check if all cells were visited
+bool PlayWindow::checkIfEnd() {
+    for (int i = 0; i < rows*cols; i++) {
+        if (visited_arr[i] == 0) {
+            return false;
+        }
+    }
+    return true;
+}
