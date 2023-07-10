@@ -42,17 +42,11 @@ void SettingsWindow::on_pushSaveButton_clicked() {
 
 bool checkNumOfMines(int num, int &square, QString &strError) {
 
-    if (num < 1 || num > square / 10) {
+    if (num < 1 || num > square / 3) {
         strError = "NUMBEROFMINES IS INCORRECT!";
         qDebug() << strError;
         return false;
     }
-    /*for(int i = 0; i < testString.length(); i++) {
-        QChar ch = testString.at(i);
-        if (!checkIfDigit(ch)) {
-            return false;
-        }
-    }*/
     return true;
 }
 

@@ -13,11 +13,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     playwindow.cpp \
-    settingswindow.cpp
+    settingswindow.cpp \
+    qrightclickbutton.cpp
 
 HEADERS  += mainwindow.h \
     playwindow.h \
-    settingswindow.h
+    settingswindow.h \
+    qrightclickbutton.h
 
 FORMS    += mainwindow.ui \
     playwindow.ui \

@@ -140,22 +140,26 @@ int PlayWindow::checkNeighbourCells(int butNum) {
 
     while (queue.length() > 0) {
         butNum = queue.at(0);
-        arr_of_neighbours[0] = butNum - rows;
-        arr_of_neighbours[1] = butNum - rows + 1;
+        qDebug() << "ButNum =" << butNum;
+        arr_of_neighbours[0] = butNum - cols;
+        arr_of_neighbours[1] = butNum - cols + 1;
         arr_of_neighbours[2] = butNum + 1;
-        arr_of_neighbours[3] = butNum + rows + 1;
-        arr_of_neighbours[4] = butNum + rows;
-        arr_of_neighbours[5] = butNum + rows - 1;
+        arr_of_neighbours[3] = butNum + cols + 1;
+        arr_of_neighbours[4] = butNum + cols;
+        arr_of_neighbours[5] = butNum + cols - 1;
         arr_of_neighbours[6] = butNum - 1;
-        arr_of_neighbours[7] = butNum - rows - 1;
+        arr_of_neighbours[7] = butNum - cols - 1;
         queue.dequeue();
         for (int i = 0; i < 8; i++) {
             // check cell
-            qDebug() << "butNum: " << butNum;
             int res = checkNeighbourCell(butNum, arr_of_neighbours[i]);
             if (res == 0 &&
                 visited_arr[arr_of_neighbours[i]] == 0) {
+                qDebug() << "i =" << i << ", arr_of_neighbours[i] =" << arr_of_neighbours[i];
                 queue.enqueue(arr_of_neighbours[i]);
+                visited_arr[arr_of_neighbours[i]] = 1;
+            } else if (res == 1 && visited_arr[arr_of_neighbours[i]] == 0) {
+                qDebug() << "i =" << i << ", arr_of_neighbours[i] =" << arr_of_neighbours[i];
                 visited_arr[arr_of_neighbours[i]] = 1;
             }
         }
@@ -165,35 +169,48 @@ int PlayWindow::checkNeighbourCells(int butNum) {
     delete arr_of_neighbours;
     int minesInNeighbourCells = 0;
     QPushButton* button;
+
     for (int j = 0; j < rows*cols; j++) {
         if (visited_arr[j] == 1) {
-            qDebug() << "j=" << j;
-            if (checkForMinesCount(j - rows, j - rows) == 1) {
+            if (checkForMinesCount(j - cols, j - cols) == 1) {
+                qDebug() << "MinesCounter0:" << minesInNeighbourCells;
                 minesInNeighbourCells++;
             }
-            if (j % cols != (cols-1) && checkForMinesCount(j - rows + 1, j - rows + 1) == 1) {
+            if (((j % cols) != (cols-1)) && checkForMinesCount(j - cols + 1, j - cols + 1) == 1) {
+                //qDebug() << "j:" << j;
+                qDebug() << "MinesCounter1:" << minesInNeighbourCells;
                 minesInNeighbourCells++;
             }
-            if (j % cols != (cols - 1) && checkForMinesCount(j + 1, j + 1) == 1) {
+            if (((j % cols) != (cols - 1)) && checkForMinesCount(j + 1, j + 1) == 1) {
+                qDebug() << "MinesCounter2:" << minesInNeighbourCells;
+                //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
-            if (j % cols != (cols - 1) && checkForMinesCount(j + rows + 1, j + rows + 1) == 1) {
+            if (((j % cols) != (cols - 1)) && checkForMinesCount(j + cols + 1, j + cols + 1) == 1) {
+                qDebug() << "MinesCounter3:" << minesInNeighbourCells;
+                //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
-            if (checkForMinesCount(j + rows, j + rows) == 1) {
+            if (checkForMinesCount(j + cols, j + cols) == 1) {
+                qDebug() << "MinesCounter4:" << minesInNeighbourCells;
                 minesInNeighbourCells++;
             }
-            if (j % cols != 0 && checkForMinesCount(j + rows - 1, j + rows - 1) == 1) {
+            if (((j % cols) != 0) && checkForMinesCount(j + cols - 1, j + cols - 1) == 1) {
+                qDebug() << "MinesCounter5:" << minesInNeighbourCells;
+                //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
-            if (j % cols != 0 && checkForMinesCount(j - 1, j - 1) == 1) {
+            if (((j % cols) != 0) && checkForMinesCount(j - 1, j - 1) == 1) {
+                qDebug() << "MinesCounter6:" << minesInNeighbourCells;
+                //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
-            if (j % cols != 0 && checkForMinesCount(j - rows - 1, j - rows - 1) == 1) {
+            if (((j % cols) != 0) && checkForMinesCount(j - cols - 1, j - cols - 1) == 1) {
+                qDebug() << "MinesCounter7:" << minesInNeighbourCells;
+                //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
            button = ui->gridLayoutWidget->findChild<QPushButton *>("pushButton_" + QString::number(j));
-           //button->setDisabled(true);
            setIconWithDigit(button, minesInNeighbourCells);
         }
         minesInNeighbourCells = 0;
@@ -205,55 +222,56 @@ int PlayWindow::checkNeighbourCells(int butNum) {
 int PlayWindow::checkNeighbourCell(int firstParam, int butNum) {
 
     if (!checkIfValidCoord(firstParam, butNum)) {
+        qDebug() << "Invalid button!";
         return 10;
     }
     for (int i = 0; i < numOfMines; i++) {
         if (mines_arr[i] == butNum) {
-            qDebug() << "This button contains mine!";
+            //qDebug() << "This button contains mine!";
             return 2;
         }
     }
 
-    int upCellNum = butNum - rows;
-    int upRightCellNum = butNum - rows + 1;
+    int upCellNum = butNum - cols;
+    int upRightCellNum = butNum - cols + 1;
     int rightCellNum = butNum + 1;
-    int downRightCellNum = butNum + rows + 1;
-    int downCellNum = butNum + rows;
-    int downLeftCellNum = butNum + rows - 1;
+    int downRightCellNum = butNum + cols + 1;
+    int downCellNum = butNum + cols;
+    int downLeftCellNum = butNum + cols - 1;
     int leftCellNum = butNum - 1;
-    int upLeftCellNum = butNum - rows - 1;
+    int upLeftCellNum = butNum - cols - 1;
 
     for (int i = 0; i < numOfMines; i++) {
         if (checkIfValidCoord(butNum, upCellNum) && mines_arr[i] == upCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "1. This button" << butNum << " has mine neighbours:" << upCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, upRightCellNum) && mines_arr[i] == upRightCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "2. This button" << butNum << " has mine neighbours:" << upRightCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, rightCellNum) && mines_arr[i] == rightCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "3. This button" << butNum << " has mine neighbours:" << rightCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, downRightCellNum) && mines_arr[i] == downRightCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "4. This button" << butNum << " has mine neighbours:" << downRightCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, downCellNum) && mines_arr[i] == downCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "5. This button" << butNum << " has mine neighbours:" << downCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, downLeftCellNum) && mines_arr[i] == downLeftCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "6. This button" << butNum << " has mine neighbours:" << downLeftCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, leftCellNum) && mines_arr[i] == leftCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "7. This button" << butNum << " has mine neighbours:" << leftCellNum;
             return 1;
         }
         if (checkIfValidCoord(butNum, upLeftCellNum) && mines_arr[i] == upLeftCellNum) {
-            qDebug() << "This button has mine neighbours!";
+            qDebug() << "8. This button" << butNum << " has mine neighbours:" << upLeftCellNum;
             return 1;
         }
 
@@ -268,7 +286,7 @@ int PlayWindow::checkForMinesCount(int firstParam, int num) {
     }
     for (int i = 0; i < numOfMines; i++) {
         if (mines_arr[i] == num) {
-            qDebug() << "This button has mine neighbours!";
+            //qDebug() << "This button has mine neighbours!";
             return 1;
         }
     }
@@ -280,10 +298,10 @@ bool PlayWindow::checkIfValidCoord(int firstParam, int num) {
     int x = num % cols;
     int y = num / rows;
     int x_prev = firstParam % cols;
-    qDebug() << "X: " << x << " Y: " << y;
+    //qDebug() << "X: " << x << " Y: " << y;
     // if cell is out of range
-    if (x < 0 || y < 0 || x >= cols || y >= rows || x == 0 && x_prev == 9 || x == 9 && x_prev == 0) {
-        qDebug() << "Out of range!";
+    if (x < 0 || y < 0 || x >= cols || y > rows || (x == 0 && x_prev == (cols-1)) || (x == (cols-1) && x_prev == 0)) {
+        //qDebug() << "Out of range!";
         return false;
     }
     return true;
@@ -291,6 +309,7 @@ bool PlayWindow::checkIfValidCoord(int firstParam, int num) {
 
 
 void PlayWindow::setIconWithDigit(QPushButton* button, int minesNum) {
+    qDebug() << button->objectName();
     if (button == NULL) {
         qDebug() << "Button was not found!";
         return;
