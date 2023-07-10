@@ -27,18 +27,20 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     ui->gridLayoutWidget_2->setMinimumSize(44*cols, 40);
 
     visited_arr = new int[rows*cols];
-    butArr = new QPushButton*[cols*rows];
+    butArr = new QRightClickButton*[cols*rows];
     qDebug() << QDir::currentPath();
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            QPushButton *pushButton = new QPushButton(this);
+            QRightClickButton *pushButton = new QRightClickButton(this);
             QString buttonName = "pushButton_";
             pushButton->setObjectName(buttonName.append(QString::number(i*cols+j)));
             pushButton->setFixedSize(37, 37);
             pushButton->setIconSize(QSize(37, 37));
             butArr[i*cols+j] = pushButton;
             visited_arr[i*cols+j] = 0;
+            pushButton->setEnabled(true);
             connect(pushButton, SIGNAL(clicked()), this, SLOT(on_button_clicked()));
+            connect(pushButton, SIGNAL(rightClicked()), this, SLOT(on_right_clicked()));
             ui->gridLayout->addWidget(pushButton, i, j);
         }
     }
@@ -58,7 +60,7 @@ PlayWindow::~PlayWindow() {
 }
 
 void PlayWindow::on_button_clicked() {
-    QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());
+    QRightClickButton* buttonSender = qobject_cast<QRightClickButton*>(sender());
     QString textStart = "You have clicked buttton: ";
     QString text = textStart.append(buttonSender->objectName());
     qDebug()<< text;
@@ -67,6 +69,9 @@ void PlayWindow::on_button_clicked() {
     QString buttonNumStr = strList.value(1);
     int buttonNumInt = buttonNumStr.toInt();
     this->clickedButton = buttonNumInt;
+    if (visited_arr[buttonNumInt] == 2) {
+        return;
+    }
     if (checkIfMine(buttonSender, buttonNumInt)) {
         QString text = "Mines Left: ";
         QString num = QString::number(this->minesCounter);
@@ -75,6 +80,20 @@ void PlayWindow::on_button_clicked() {
     } else {
         checkNeighbourCells(buttonNumInt);
     }
+}
+
+void PlayWindow::on_right_clicked() {
+    QRightClickButton* buttonSender = qobject_cast<QRightClickButton*>(sender());
+    QString textStart = "You have right-clicked buttton: ";
+    QString text = textStart.append(buttonSender->objectName());
+    qDebug()<< text;
+    QStringList strList = buttonSender->objectName().split("_");
+    QString buttonNumStr = strList.value(1);
+    int buttonNumInt = buttonNumStr.toInt();
+    if (visited_arr[buttonNumInt] != 2 && visited_arr[buttonNumInt] != 1) {
+        setIconToButton(buttonSender, -1);
+    }
+    visited_arr[buttonNumInt] = 2;
 }
 
 int* PlayWindow::generateMines(int square) {
@@ -104,7 +123,7 @@ int* PlayWindow::generateMines(int square) {
 
 }
 
-bool PlayWindow::checkIfMine(QPushButton* but, int buttonNumInt) {
+bool PlayWindow::checkIfMine(QRightClickButton* but, int buttonNumInt) {
     for (int i = 0; i < numOfMines; i++) {
         if (buttonNumInt == mines_arr[i]) {
             this->minesCounter--;
@@ -168,7 +187,7 @@ int PlayWindow::checkNeighbourCells(int butNum) {
     qDebug() << "jjjjj";
     delete arr_of_neighbours;
     int minesInNeighbourCells = 0;
-    QPushButton* button;
+    QRightClickButton* button;
 
     for (int j = 0; j < rows*cols; j++) {
         if (visited_arr[j] == 1) {
@@ -210,8 +229,8 @@ int PlayWindow::checkNeighbourCells(int butNum) {
                 //qDebug() << "j:" << j;
                 minesInNeighbourCells++;
             }
-           button = ui->gridLayoutWidget->findChild<QPushButton *>("pushButton_" + QString::number(j));
-           setIconWithDigit(button, minesInNeighbourCells);
+           button = ui->gridLayoutWidget->findChild<QRightClickButton *>("pushButton_" + QString::number(j));
+           setIconToButton(button, minesInNeighbourCells);
         }
         minesInNeighbourCells = 0;
     }
@@ -308,10 +327,17 @@ bool PlayWindow::checkIfValidCoord(int firstParam, int num) {
 }
 
 
-void PlayWindow::setIconWithDigit(QPushButton* button, int minesNum) {
+void PlayWindow::setIconToButton(QRightClickButton* button, int minesNum) {
     qDebug() << button->objectName();
     if (button == NULL) {
         qDebug() << "Button was not found!";
+        return;
+    }
+    QStringList strList = button->objectName().split("_");
+    QString buttonNumStr = strList.value(1);
+    int buttonNumInt = buttonNumStr.toInt();
+    qDebug() << "buttonNumInt =" << buttonNumInt;
+    if (visited_arr[buttonNumInt]==2) {
         return;
     }
     button->setIconSize(QSize(37, 37));
@@ -329,5 +355,9 @@ void PlayWindow::setIconWithDigit(QPushButton* button, int minesNum) {
         button->setIcon(QIcon("digit_5.png"));
     } else if (minesNum == 6) {
         button->setIcon(QIcon("digit_6.png"));
+    } else if (minesNum == -1) {
+        button->setIcon(QIcon("flag.png"));
     }
 }
+
+

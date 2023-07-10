@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QPushButton>
+#include "qrightclickbutton.h"
 
 namespace Ui {
     class PlayWindow;
@@ -23,7 +24,7 @@ private:
     int cols;
     int clickedButton;
     QString boardSize;
-    QPushButton **butArr;
+    QRightClickButton **butArr;
 
     int *mines_arr;
     int *found_mines_arr;
@@ -31,11 +32,12 @@ private:
 
 private slots:
     void on_button_clicked();
-    bool checkIfMine(QPushButton*, int);
+    void on_right_clicked();
+    bool checkIfMine(QRightClickButton*, int);
     int* generateMines(int);
     int checkNeighbourCells(int);
     int checkNeighbourCell(int, int);
-    void setIconWithDigit(QPushButton*, int);
+    void setIconToButton(QRightClickButton*, int);
     bool checkIfValidCoord(int, int);
     int checkForMinesCount(int, int);
 
