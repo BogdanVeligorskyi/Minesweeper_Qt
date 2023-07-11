@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QQueue>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QTimer>
 #include "qrightclickbutton.h"
 
@@ -47,6 +48,7 @@ private slots:
     int checkForMinesCount(int, int);
     bool checkIfEnd();
     void timeCounterUpdate();
+    void addResultToFile(QString name);
 
 };
 

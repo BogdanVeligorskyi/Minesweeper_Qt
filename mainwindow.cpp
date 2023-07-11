@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "playwindow.h"
 #include "settingswindow.h"
+#include "results.h"
 #include "ui_mainwindow.h"
 
 
@@ -11,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindow = new SettingsWindow(this);
     setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
-    this->setWindowIcon(QIcon("mine_usual.png"));
+    this->setWindowIcon(QIcon("icons/mine_usual.png"));
 }
 
 // window destructor
@@ -33,5 +34,12 @@ void MainWindow::on_pushSettingsButton_clicked() {
     qDebug()<< "Returned to Main menu";
     QString boardSize = setWindow->getBoardSize();
     qDebug() << boardSize;
+    this->show();
+}
+
+void MainWindow::on_pushResultsButton_clicked() {
+    this->hide();
+    resWindow = new Results(this);
+    resWindow->exec();
     this->show();
 }

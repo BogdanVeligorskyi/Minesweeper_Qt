@@ -32,6 +32,8 @@ private:
 
 private slots:
     void on_pushSaveButton_clicked();
+    bool readSettingsFromFile();
+    void saveSettingsToFile();
 };
 
 #endif // SETTINGSWINDOW_H

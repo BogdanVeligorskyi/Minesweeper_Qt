@@ -14,13 +14,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     playwindow.cpp \
     settingswindow.cpp \
-    qrightclickbutton.cpp
+    qrightclickbutton.cpp \
+    results.cpp
 
 HEADERS  += mainwindow.h \
     playwindow.h \
     settingswindow.h \
-    qrightclickbutton.h
+    qrightclickbutton.h \
+    results.h
 
 FORMS    += mainwindow.ui \
     playwindow.ui \
-    settingswindow.ui
+    settingswindow.ui \
+    results.ui

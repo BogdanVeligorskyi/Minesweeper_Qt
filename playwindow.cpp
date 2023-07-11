@@ -96,6 +96,8 @@ void PlayWindow::on_button_clicked() {
     if (checkIfEnd()) {
         timer->stop();
         QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
+        QString name = QInputDialog::getText(this, "Results", "Enter your name");
+        addResultToFile(name);
         delete this->butArr;
         delete this->visited_arr;
         secondsAfterStart = 0;
@@ -139,6 +141,8 @@ void PlayWindow::on_right_clicked() {
     if (checkIfEnd()) {
         timer->stop();
         QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
+        QString name = QInputDialog::getText(this, "Results", "Enter your name");
+        addResultToFile(name);
         delete this->butArr;
         delete this->visited_arr;
         secondsAfterStart = 0;
@@ -306,8 +310,8 @@ int PlayWindow::checkNeighbourCell(int firstParam, int butNum) {
     for (int i = 0; i < numOfMines; i++) {
         for (int j = 0; j < 8; j++) {
             if (checkIfValidCoord(butNum, arr[j]) && mines_arr[i] == arr[j]) {
-                qDebug() << i+1 << " This button" << butNum << " has mine neighbours:" << arr[i];
-                qDebug() << arr[i];
+                //qDebug() << i+1 << " This button" << butNum << " has mine neighbours:" << arr[j];
+                //qDebug() << arr[j];
                 return 1;
             }
         }
@@ -364,25 +368,29 @@ void PlayWindow::setIconToButton(QRightClickButton* button, int minesNum) {
 
     button->setIconSize(QSize(37, 37));
     if (minesNum == 0) {
-        button->setIcon(QIcon("empty_cell.png"));
+        button->setIcon(QIcon("icons/empty_cell.png"));
     } else if (minesNum == 1) {
-        button->setIcon(QIcon("digit_1.png"));
+        button->setIcon(QIcon("icons/digit_1.png"));
     } else if (minesNum == 2) {
-        button->setIcon(QIcon("digit_2.png"));
+        button->setIcon(QIcon("icons/digit_2.png"));
     } else if (minesNum == 3) {
-        button->setIcon(QIcon("digit_3.png"));
+        button->setIcon(QIcon("icons/digit_3.png"));
     } else if (minesNum == 4) {
-        button->setIcon(QIcon("digit_4.png"));
+        button->setIcon(QIcon("icons/digit_4.png"));
     } else if (minesNum == 5) {
-        button->setIcon(QIcon("digit_5.png"));
+        button->setIcon(QIcon("icons/digit_5.png"));
     } else if (minesNum == 6) {
-        button->setIcon(QIcon("digit_6.png"));
+        button->setIcon(QIcon("icons/digit_6.png"));
+    } else if (minesNum == 7) {
+        button->setIcon(QIcon("icons/digit_7.png"));
+    } else if (minesNum == 8) {
+        button->setIcon(QIcon("icons/digit_8.png"));
     } else if (minesNum == -1) {
-        button->setIcon(QIcon("flag.png"));
+        button->setIcon(QIcon("icons/flag.png"));
     } else if (minesNum == -2) {
         button->setIcon(QIcon());
     } else if(minesNum == -3) {
-        button->setIcon(QIcon("mine_clicked.png"));
+        button->setIcon(QIcon("icons/mine_clicked.png"));
     }
 
 }
@@ -423,4 +431,26 @@ void PlayWindow::timeCounterUpdate() {
     }
 
     ui->labelTime->setText(timeText);
+}
+
+void PlayWindow::addResultToFile(QString name) {
+    char filename[] = "files/results.txt";
+    FILE *fa = fopen(filename, "a");
+    if (fa == NULL) {
+        qDebug() << "results.txt hasn`t been found!";
+        return;
+    }
+
+    QStringList timeStr = (ui->labelTime->text()).split(": ");
+    QByteArray boardBA = this->boardSize.toLocal8Bit();
+    const char* charBoardSize = boardBA.data();
+
+    QByteArray nameBA = name.toLocal8Bit();
+    const char* charName = nameBA.data();
+
+    QString time = timeStr.at(1);
+    QByteArray timeBA = time.toLocal8Bit();
+    const char* timeName = timeBA.data();
+    fprintf(fa, "%s,%s,%d,%s\n", charName, charBoardSize, this->numOfMines, timeName);
+    fclose(fa);
 }

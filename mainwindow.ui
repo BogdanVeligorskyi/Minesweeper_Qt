@@ -40,6 +40,21 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushResultsButton">
+       <property name="font">
+        <font>
+         <family>MV Boli</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Results</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushSettingsButton">
        <property name="font">
         <font>

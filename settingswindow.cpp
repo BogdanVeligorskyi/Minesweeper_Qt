@@ -11,8 +11,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     ui->setupUi(this);
-    this->numOfMines = 10;
-    this->boardSize = "10x10";
+    if (!readSettingsFromFile()) {
+        this->numOfMines = 10;
+        this->boardSize = "10x10";
+    }
+
+    ui->lineEditNumOfMines->setText(QString::number(this->numOfMines));
+    ui->lineEditSize->setText(this->boardSize);
+
     ui->labelErrorText->setStyleSheet("QLabel {color : red}");
     ui->labelErrorText->setText("");
 }
@@ -35,6 +41,8 @@ void SettingsWindow::on_pushSaveButton_clicked() {
     this->numOfMines = strNumOfMines.toInt();
     this->boardSize = strBoardSize;
     ui->labelErrorText->setText("");
+    saveSettingsToFile();
+
     this->hide();
 }
 
@@ -102,4 +110,39 @@ bool checkIfDigit(QChar c) {
         return true;
     }
     return false;
+}
+
+bool SettingsWindow::readSettingsFromFile() {
+    char buf[80];
+    FILE *fr = fopen("files/settings.txt", "rt");
+    if (fr == NULL) {
+        qDebug() << "Can`t open settings.txt!";
+        return false;
+    }
+    QString line = "";
+    while (fgets(buf, 80, fr) != NULL) {
+        line = QString(buf);
+    }
+    QStringList strList = line.split(",");
+    QString boardStr = strList.at(0);
+    QString minesNumStr = strList.at(1);
+    this->boardSize = boardStr;
+    this->numOfMines = minesNumStr.toInt();
+    fclose(fr);
+    return true;
+}
+
+void SettingsWindow::saveSettingsToFile() {
+    char filename[] = "files/settings.txt";
+    FILE *fw = fopen(filename, "w");
+    if (fw == NULL) {
+        qDebug() << "settings.txt hasn`t been found!";
+        return;
+    }
+
+    QByteArray boardBA = this->boardSize.toLocal8Bit();
+    const char* charBoardSize = boardBA.data();
+
+    fprintf(fw, "%s,%d", charBoardSize, this->numOfMines);
+    fclose(fw);
 }
