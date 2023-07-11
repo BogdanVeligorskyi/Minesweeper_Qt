@@ -11,6 +11,11 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     this->numOfMines = numOfMines;
     this->boardSize = boardSize;
 
+    timer = new QTimer(this);
+    secondsAfterStart = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(timeCounterUpdate()));
+    timer->start(1000);
+
     QString text = "Mines Left: ";
     QString num = QString::number(this->numOfMines);
     text.append(num);
@@ -77,9 +82,11 @@ void PlayWindow::on_button_clicked() {
     // stop the game if it`s true
     if (checkIfMine(buttonNumInt)) {
         setIconToButton(buttonSender, -3);
+        timer->stop();
         QMessageBox::about(this, "Game over", "Unfortunately, you`ve lost the game!");
         delete this->butArr;
         delete this->visited_arr;
+        secondsAfterStart = 0;
         this->hide();
     // otherwise start checking surrounded (neighbour) cells
     } else {
@@ -87,9 +94,12 @@ void PlayWindow::on_button_clicked() {
     }
 
     if (checkIfEnd()) {
+        timer->stop();
         QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
         delete this->butArr;
         delete this->visited_arr;
+        secondsAfterStart = 0;
+
         this->hide();
     }
 }
@@ -105,7 +115,6 @@ void PlayWindow::on_right_clicked() {
     QStringList strList = buttonSender->objectName().split("_");
     QString buttonNumStr = strList.value(1);
     int buttonNumInt = buttonNumStr.toInt();
-
 
 
     // if cell hasn`t been clicked or visited
@@ -128,9 +137,11 @@ void PlayWindow::on_right_clicked() {
     ui->labelMinesLeft->setText(text);
 
     if (checkIfEnd()) {
+        timer->stop();
         QMessageBox::about(this, "Game over", "Congratulations, you`ve won the game!");
         delete this->butArr;
         delete this->visited_arr;
+        secondsAfterStart = 0;
         this->hide();
     }
 }
@@ -295,11 +306,13 @@ int PlayWindow::checkNeighbourCell(int firstParam, int butNum) {
     for (int i = 0; i < numOfMines; i++) {
         for (int j = 0; j < 8; j++) {
             if (checkIfValidCoord(butNum, arr[j]) && mines_arr[i] == arr[j]) {
-                //qDebug() << "1. This button" << butNum << " has mine neighbours:" << upCellNum;
+                qDebug() << i+1 << " This button" << butNum << " has mine neighbours:" << arr[i];
+                qDebug() << arr[i];
                 return 1;
             }
         }
     }
+    delete arr;
     return 0;
 }
 
@@ -322,11 +335,11 @@ int PlayWindow::checkForMinesCount(int firstParam, int num) {
 bool PlayWindow::checkIfValidCoord(int firstParam, int num) {
 
     int x = num % cols;
-    int y = num / rows;
+    int y = num / cols;
     int x_prev = firstParam % cols;
 
     // if cell is out of range
-    if (x < 0 || y < 0 || x >= cols || y > rows ||
+    if (x < 0 || y < 0 || x >= cols || y >= rows ||
         (x == 0 && x_prev == (cols-1)) || (x == (cols-1) && x_prev == 0)) {
         return false;
     }
@@ -383,4 +396,31 @@ bool PlayWindow::checkIfEnd() {
         }
     }
     return true;
+}
+
+
+// time counter update
+void PlayWindow::timeCounterUpdate() {
+    QString timeText = "Time: ";
+    secondsAfterStart++;
+
+    int seconds = secondsAfterStart % 60;
+    int minutes = secondsAfterStart / 60;
+    if (minutes < 10) {
+        timeText.append("0");
+        timeText.append(QString::number(minutes));
+    } else {
+        timeText.append(QString::number(minutes));
+    }
+
+    timeText.append(":");
+
+    if (seconds < 10) {
+        timeText.append("0");
+        timeText.append(QString::number(seconds));
+    } else {
+        timeText.append(QString::number(seconds));
+    }
+
+    ui->labelTime->setText(timeText);
 }

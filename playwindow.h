@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QQueue>
 #include <QMessageBox>
+#include <QTimer>
 #include "qrightclickbutton.h"
 
 namespace Ui {
@@ -26,8 +27,10 @@ private:
     int rows;                   // number of rows
     int cols;                   // number of columns
     int clickedButton;          // number of clicked button
+    int secondsAfterStart;      // for time counter
     QString boardSize;          // number of rows and cols as QString
     QRightClickButton **butArr; // array with all buttons
+    QTimer *timer;              // time counter
 
     int *mines_arr;             // array of mines
     int* visited_arr;           // array of marked cells
@@ -43,6 +46,7 @@ private slots:
     bool checkIfValidCoord(int, int);
     int checkForMinesCount(int, int);
     bool checkIfEnd();
+    void timeCounterUpdate();
 
 };
 
