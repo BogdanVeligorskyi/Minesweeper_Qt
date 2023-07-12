@@ -1,6 +1,7 @@
 #include "results.h"
 #include "ui_results.h"
 
+// constructor
 Results::Results(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Results) {
@@ -9,10 +10,14 @@ Results::Results(QWidget *parent) :
     readResultsFromFile();
 }
 
+
+// destructor
 Results::~Results() {
     delete ui;
 }
 
+
+// read results from results.txt file
 void Results::readResultsFromFile() {
     char buf[80];
     FILE *fr = fopen("files/results.txt", "rt");
@@ -73,8 +78,5 @@ void Results::readResultsFromFile() {
 
     fclose(fr);
 
-    //QString minesNumStr = strList.at(1);
-    //this->boardSize = boardStr;
-    //this->numOfMines = minesNumStr.toInt();
     return;
 }

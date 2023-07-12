@@ -16,6 +16,7 @@ namespace Ui {
     class MainWindow;
 }
 
+// Main Window class
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -31,7 +32,6 @@ private:
 
 private slots:
     void on_pushResultsButton_clicked();
-    //void on_pushButton_clicked();
     void on_pushSettingsButton_clicked();
     void on_pushPlayButton_clicked();
 

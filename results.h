@@ -11,8 +11,8 @@ namespace Ui {
     class Results;
 }
 
-class Results : public QDialog
-{
+// Results Window class
+class Results : public QDialog {
     Q_OBJECT
 
 public:

@@ -4,8 +4,8 @@
 #include <QPushButton>
 #include <QMouseEvent>
 
-class QRightClickButton : public QPushButton
-{
+// class for implementsing click on RMB
+class QRightClickButton : public QPushButton {
     Q_OBJECT
 
 public:
@@ -16,8 +16,6 @@ private slots:
 
 signals:
     void rightClicked();
-
-public slots:
 
 };
 

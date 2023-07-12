@@ -1,10 +1,13 @@
 #include "settingswindow.h"
 #include "ui_settingswindow.h"
 
+
 bool checkBoardSize(QString, int &, QString &);
 bool checkIfDigit(QChar);
 bool checkNumOfMines(int, int &, QString &);
 
+
+// constructor
 SettingsWindow::SettingsWindow(QWidget *parent) :
         QDialog(parent),
         ui(new Ui::SettingsWindow)
@@ -29,6 +32,7 @@ SettingsWindow::~SettingsWindow() {
 }
 
 
+// handler for 'Save' button
 void SettingsWindow::on_pushSaveButton_clicked() {
     QString strNumOfMines = ui->lineEditNumOfMines->text();
     QString strBoardSize = ui->lineEditSize->text();
@@ -46,6 +50,8 @@ void SettingsWindow::on_pushSaveButton_clicked() {
     this->hide();
 }
 
+
+// check entered number of mines
 bool checkNumOfMines(int num, int &square, QString &strError) {
 
     if (num < 1 || num > square / 3) {
@@ -56,6 +62,8 @@ bool checkNumOfMines(int num, int &square, QString &strError) {
     return true;
 }
 
+
+// check entered board size
 bool checkBoardSize(QString str, int &square, QString &strError) {
     if (str.isEmpty()) {
         strError = "Line in BOARDSIZE is empty!";
@@ -105,6 +113,8 @@ bool checkBoardSize(QString str, int &square, QString &strError) {
     return true;
 }
 
+
+// determine whether char is digit or not
 bool checkIfDigit(QChar c) {
     if(c.isDigit()) {
         return true;
@@ -112,6 +122,8 @@ bool checkIfDigit(QChar c) {
     return false;
 }
 
+
+// read settings from settings.txt file
 bool SettingsWindow::readSettingsFromFile() {
     char buf[80];
     FILE *fr = fopen("files/settings.txt", "rt");
@@ -132,6 +144,8 @@ bool SettingsWindow::readSettingsFromFile() {
     return true;
 }
 
+
+// save settings to settings.txt file
 void SettingsWindow::saveSettingsToFile() {
     char filename[] = "files/settings.txt";
     FILE *fw = fopen(filename, "w");

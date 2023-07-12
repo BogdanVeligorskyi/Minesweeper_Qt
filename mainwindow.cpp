@@ -15,12 +15,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowIcon(QIcon("icons/mine_usual.png"));
 }
 
+
 // window destructor
 MainWindow::~MainWindow() {
     delete ui;
 }
 
 
+// handler for 'Play' button
 void MainWindow::on_pushPlayButton_clicked() {
     plWindow = new PlayWindow(this, setWindow->getNumOfMines(), setWindow->getBoardSize());
     this->hide();
@@ -28,6 +30,8 @@ void MainWindow::on_pushPlayButton_clicked() {
     this->show();
 }
 
+
+// handler for 'Settings' button
 void MainWindow::on_pushSettingsButton_clicked() {
     this->hide();
     setWindow->exec();
@@ -37,6 +41,8 @@ void MainWindow::on_pushSettingsButton_clicked() {
     this->show();
 }
 
+
+// handler for 'Results' button
 void MainWindow::on_pushResultsButton_clicked() {
     this->hide();
     resWindow = new Results(this);

@@ -2,7 +2,7 @@
 #include "playwindow.h"
 #include "ui_playwindow.h"
 
-
+// constructor
 PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
         QDialog(parent),
         ui(new Ui::PlayWindow) {
@@ -11,11 +11,13 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     this->numOfMines = numOfMines;
     this->boardSize = boardSize;
 
+    // create time counter
     timer = new QTimer(this);
     secondsAfterStart = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(timeCounterUpdate()));
     timer->start(1000);
 
+    // preparational tasks
     QString text = "Mines Left: ";
     QString num = QString::number(this->numOfMines);
     text.append(num);
@@ -26,12 +28,14 @@ PlayWindow::PlayWindow(QWidget *parent, int numOfMines, QString boardSize) :
     rows = strRow.toInt();
     cols = strCol.toInt();
 
+    // set optimal size of window
     this->setMinimumSize(45*cols, 45*rows + 40);
     ui->gridLayoutWidget_2->setMinimumSize(44*cols, 40);
 
     visited_arr = new int[rows*cols];
     butArr = new QRightClickButton*[cols*rows];
 
+    // create rows*cols buttons
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             QRightClickButton *pushButton = new QRightClickButton(this);
@@ -433,6 +437,8 @@ void PlayWindow::timeCounterUpdate() {
     ui->labelTime->setText(timeText);
 }
 
+
+// add result to results.txt file
 void PlayWindow::addResultToFile(QString name) {
     char filename[] = "files/results.txt";
     FILE *fa = fopen(filename, "a");

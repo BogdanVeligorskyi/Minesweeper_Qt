@@ -10,6 +10,7 @@ namespace Ui {
     class SettingsWindow;
 }
 
+// Settings Window class
 class SettingsWindow : public QDialog {
     Q_OBJECT
 

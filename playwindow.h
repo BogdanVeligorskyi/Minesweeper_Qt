@@ -14,6 +14,7 @@ namespace Ui {
     class PlayWindow;
 }
 
+// Play Window class
 class PlayWindow : public QDialog {
     Q_OBJECT
 
